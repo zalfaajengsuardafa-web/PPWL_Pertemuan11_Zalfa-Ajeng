@@ -21,16 +21,16 @@ use Illuminate\Support\Facades\Route;
 /*
  * Satu baris perintah `Auth::routes()` mendaftarkan seluruh endpoint/alamat URL
  * autentikasi bawaan Laravel (login, register, logout, reset password) secara otomatis.
- * 
+ *
  * Pada konfigurasi di bawah, opsional `'register' => false` dan `'reset' => false` diterapkan.
  * Pengaturan ini secara eksplisit menonaktifkan pembuatan rute pendaftaran akun baru dan lupa password.
- * 
+ *
  * Alasan Keamanan & Hasil Pengujian Praktikum:
  * Langkah ini sangat krusial karena jika fitur pendaftaran hanya disembunyikan tombolnya di tampilan (UI),
  * pengguna luar masih bisa mengakses formulir registrasi dengan mengetikkan URL `/register` secara langsung di browser.
- * 
+ *
  * Melalui pengujian pembuktian langsung di browser dengan mengakses alamat `http://localhost:8000/register`,
- * sistem mengembalikan kode respons **404 Not Found**. Ini membuktikan bahwa rute registrasi benar-benar tidak dibuat 
+ * sistem mengembalikan kode respons **404 Not Found**. Ini membuktikan bahwa rute registrasi benar-benar tidak dibuat
  * di tingkat arsitektur sistem (back-end), sehingga keamanan akses aplikasi terjamin sepenuhnya.
  */
 Auth::routes([
@@ -41,7 +41,7 @@ Auth::routes([
 // =========================================================================
 // 2. RUTE NAVIGASI UTAMA & REDIRECT
 // =========================================================================
-// Jika pengguna mengakses URL utama (http://localhost:8000/), 
+// Jika pengguna mengakses URL utama (http://localhost:8000/),
 // sistem akan otomatis mengalihkan (redirect) ke rute '/home'.
 Route::redirect('/', '/home');
 
@@ -63,46 +63,20 @@ Route::middleware('auth')->group(function () {
     // ---------------------------------------------------------------------
 
     /**
-     * Menampilkan daftar seluruh data buku.
-     * HTTP Method : GET
-     * URL         : /buku
+     * Satu baris Route::resource() membuat 6 rute CRUD buku sekaligus
+     * (menggantikan 6 rute buku yang sebelumnya ditulis satu per satu):
+     *
+     * GET     /buku              -> index    (buku.index)    : daftar buku
+     * GET     /buku/create       -> create   (buku.create)   : formulir tambah
+     * POST    /buku              -> store    (buku.store)    : simpan data + upload sampul
+     * GET     /buku/{buku}/edit  -> edit     (buku.edit)     : formulir ubah
+     * PUT     /buku/{buku}       -> update   (buku.update)   : simpan perubahan
+     * DELETE  /buku/{buku}       -> destroy  (buku.destroy)  : hapus data + berkas sampul
+     *
+     * except('show') dipakai karena halaman detail buku tidak dibutuhkan.
+     * Pembatasan admin dipasang di constructor BukuController (auth + admin kecuali index).
      */
-    Route::get('/buku', [BukuController::class, 'index'])->name('buku.index');
-
-    /**
-     * Menampilkan formulir tambah buku baru.
-     * HTTP Method : GET
-     * URL         : /buku/create
-     */
-    Route::get('/buku/create', [BukuController::class, 'create'])->name('buku.create');
-
-    /**
-     * Menyimpan data buku baru yang dikirim dari formulir ke database.
-     * HTTP Method : POST
-     * URL         : /buku
-     */
-    Route::post('/buku', [BukuController::class, 'store'])->name('buku.store');
-
-    /**
-     * Menampilkan formulir edit data buku berdasarkan ID buku.
-     * HTTP Method : GET
-     * URL         : /buku/{id}/edit
-     */
-    Route::get('/buku/{id}/edit', [BukuController::class, 'edit'])->name('buku.edit');
-
-    /**
-     * Memperbarui data buku di database berdasarkan ID buku.
-     * HTTP Method : PUT
-     * URL         : /buku/{id}
-     */
-    Route::put('/buku/{id}', [BukuController::class, 'update'])->name('buku.update');
-
-    /**
-     * Menghapus data buku dari database berdasarkan ID buku.
-     * HTTP Method : DELETE
-     * URL         : /buku/{id}
-     */
-    Route::delete('/buku/{id}', [BukuController::class, 'destroy'])->name('buku.destroy');
+    Route::resource('buku', BukuController::class)->except('show');
 
     // ---------------------------------------------------------------------
     // CRUD DATA USER (UserController)
