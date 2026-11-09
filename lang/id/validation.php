@@ -13,6 +13,12 @@ return [
     'confirmed' => 'Konfirmasi :attribute tidak cocok.',
     'date_format' => ':attribute tidak sesuai format :format.',
 
+    // Pesan untuk aturan unggah berkas dan pilihan tertutup (pertemuan 11)
+    'image'    => ':attribute harus berupa gambar.',
+    'mimes'    => ':attribute harus berupa berkas bertipe: :values.',
+    'uploaded' => ':attribute gagal diunggah.',
+    'in'       => ':attribute yang dipilih tidak valid.',
+
     // Aturan yang pesannya bergantung pada tipe isian
     'min' => [
         'numeric' => ':attribute minimal bernilai :min.',
@@ -21,6 +27,7 @@ return [
     'max' => [
         'numeric' => ':attribute maksimal bernilai :max.',
         'string'  => ':attribute maksimal terdiri dari :max karakter.',
+        'file'    => ':attribute tidak boleh lebih dari :max kilobita.',
     ],
     'between' => [
         'numeric' => ':attribute harus bernilai antara :min dan :max.',
@@ -33,6 +40,8 @@ return [
         'penulis'    => 'Penulis',
         'harga'      => 'Harga',
         'tgl_terbit' => 'Tanggal terbit',
+        'jenis_buku' => 'Jenis buku',
+        'cover'      => 'Sampul',
         'email'      => 'Email',
         'password'   => 'Kata sandi',
         'name'       => 'Nama',
