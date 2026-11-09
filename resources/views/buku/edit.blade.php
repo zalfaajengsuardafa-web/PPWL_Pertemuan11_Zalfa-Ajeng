@@ -1,13 +1,13 @@
 {{-- Menginduk ke tata letak master aplikasi (layouts/master.blade.php) --}}
 @extends('layouts.master')
 
-{{-- Mengatur judul halaman pada tab browser --}}
+{{-- Mengatur judul halaman pada tab peramban --}}
 @section('title', 'Edit Buku')
 
 @section('content')
 <div class="container-fluid px-0">
 
-    {{-- Judul Halaman Utama & Breadcrumb Navigasi --}}
+    {{-- Judul Halaman Utama & Navigasi Breadcrumb --}}
     <div class="d-flex align-items-center justify-content-between mb-3">
         <div>
             <h2 class="fw-bold text-dark m-0">Edit Data Buku</h2>
@@ -28,7 +28,7 @@
     {{-- Kartu Utama Formulir Edit Buku --}}
     <div class="card border-0 shadow-sm rounded-3 mb-4">
         
-        {{-- Header Kartu dengan Aksen Warna Biru --}}
+        {{-- Header Kartu --}}
         <div class="card-header bg-white py-3 border-bottom d-flex align-items-center">
             <div class="bg-primary bg-opacity-10 text-primary p-2 rounded me-2">
                 <i class="fas fa-edit fs-5"></i>
@@ -40,7 +40,7 @@
         <div class="card-body p-4">
 
             {{-- Menampilkan Alert Notifikasi Jika Ada Kesalahan Validasi Input --}}
-            @if (count($errors) > 0)
+            @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
@@ -55,15 +55,12 @@
                 </div>
             @endif
 
-            {{-- Formulir dikirimkan ke rute buku.update dengan parameter ID buku --}}
-            <form action="{{ route('buku.update', $buku->id) }}" method="POST">
-                {{-- Token CSRF wajib untuk mengamankan request POST dari serangan Cross-Site Request Forgery --}}
+            {{-- Formulir Edit dikirimkan ke rute buku.update --}}
+            <form action="{{ route('buku.update', $buku->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                
-                {{-- Method Spoofing PUT wajib di Laravel untuk proses pembaruan data (Update) --}}
                 @method('PUT')
                 
-                {{-- Input 1: Judul Buku (Menggunakan Floating Label) --}}
+                {{-- Input 1: Judul Buku --}}
                 <div class="form-floating mb-3">
                     <input type="text" 
                            class="form-control @error('judul') is-invalid @enderror" 
@@ -75,7 +72,7 @@
                     <label for="judul"><i class="fas fa-book me-1 text-muted"></i> Judul Buku</label>
                 </div>
 
-                {{-- Input 2: Nama Penulis (Menggunakan Floating Label) --}}
+                {{-- Input 2: Nama Penulis --}}
                 <div class="form-floating mb-3">
                     <input type="text" 
                            class="form-control @error('penulis') is-invalid @enderror" 
@@ -87,7 +84,7 @@
                     <label for="penulis"><i class="fas fa-user-edit me-1 text-muted"></i> Penulis</label>
                 </div>
 
-                {{-- Input 3: Harga Buku (Menggunakan Floating Label) --}}
+                {{-- Input 3: Harga Buku --}}
                 <div class="form-floating mb-3">
                     <input type="number" 
                            class="form-control @error('harga') is-invalid @enderror" 
@@ -99,26 +96,58 @@
                     <label for="harga"><i class="fas fa-tag me-1 text-muted"></i> Harga (Rp)</label>
                 </div>
 
-                {{-- Input 4: Tanggal Terbit Buku (Menggunakan Floating Label) --}}
-                <div class="form-floating mb-4">
-                    <input type="text" 
-                           class="form-control date @error('tgl_terbit') is-invalid @enderror" 
+                {{-- Input 4: Tanggal Terbit Buku --}}
+                <div class="form-floating mb-3">
+                    <input type="date" 
+                           class="form-control @error('tgl_terbit') is-invalid @enderror" 
                            id="tgl_terbit" 
                            name="tgl_terbit" 
                            placeholder="Tanggal Terbit"
-                           value="{{ old('tgl_terbit', is_string($buku->tgl_terbit) ? $buku->tgl_terbit : $buku->tgl_terbit->format('Y/m/d')) }}" 
+                           value="{{ old('tgl_terbit', optional($buku->tgl_terbit)->format('Y-m-d')) }}" 
                            required>
-                    <label for="tgl_terbit"><i class="fas fa-calendar-alt me-1 text-muted"></i> Tanggal Terbit (YYYY/MM/DD)</label>
+                    <label for="tgl_terbit"><i class="fas fa-calendar-alt me-1 text-muted"></i> Tanggal Terbit</label>
                 </div>
 
-                {{-- Tombol Aksi (Submit & Batal) --}}
+                {{-- Input 5: Jenis Buku (Dropdown) --}}
+                <div class="form-floating mb-3">
+                    <select class="form-select @error('jenis_buku') is-invalid @enderror" id="jenis_buku" name="jenis_buku" required>
+                        <option value="" disabled>-- Pilih Jenis Buku --</option>
+                        <option value="Fiksi" {{ old('jenis_buku', $buku->jenis_buku) == 'Fiksi' ? 'selected' : '' }}>Fiksi</option>
+                        <option value="Nonfiksi" {{ old('jenis_buku', $buku->jenis_buku) == 'Nonfiksi' ? 'selected' : '' }}>Nonfiksi</option>
+                    </select>
+                    <label for="jenis_buku"><i class="fas fa-layer-group me-1 text-muted"></i> Jenis Buku</label>
+                </div>
+
+                {{-- Input 6: Upload & Pratinjau Sampul Buku --}}
+                <div class="mb-4">
+                    <label for="cover" class="form-label fw-bold text-dark mb-1">
+                        <i class="fas fa-image me-1 text-muted"></i> Sampul Buku
+                    </label>
+                    
+                    {{-- Pratinjau gambar saat ini --}}
+                    @if ($buku->cover)
+                        <div class="mb-2">
+                            <img src="{{ asset('storage/' . $buku->cover) }}" alt="Sampul {{ $buku->judul }}" class="img-thumbnail rounded shadow-sm" style="max-height: 150px;">
+                            <div class="form-text text-muted small mt-1">Sampul saat ini</div>
+                        </div>
+                    @endif
+
+                    <input type="file" 
+                           class="form-control @error('cover') is-invalid @enderror" 
+                           id="cover" 
+                           name="cover" 
+                           accept="image/png, image/jpeg, image/jpg">
+                    <div class="form-text text-muted small">
+                        Kosongkan bila tidak ingin mengganti sampul (Format: JPG, JPEG, PNG, Max 2 MB).
+                    </div>
+                </div>
+
+                {{-- Tombol Aksi --}}
                 <div class="d-flex gap-2">
-                    {{-- Tombol Simpan Perubahan (Warna Biru Utama) --}}
                     <button type="submit" class="btn btn-primary px-4 shadow-sm">
                         <i class="fas fa-save me-1"></i> Update Buku
                     </button>
                     
-                    {{-- Tombol Batal Kembali ke Halaman Daftar Buku --}}
                     <a href="{{ route('buku.index') }}" class="btn btn-secondary px-4 shadow-sm">
                         <i class="fas fa-arrow-left me-1"></i> Batal
                     </a>
