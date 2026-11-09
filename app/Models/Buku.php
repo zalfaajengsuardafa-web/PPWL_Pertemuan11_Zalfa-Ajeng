@@ -13,7 +13,15 @@ class Buku extends Model
     protected $table = 'buku';
 
     // Kolom-kolom yang boleh diisi secara massal saat simpan/update data
-    protected $fillable = ['judul', 'penulis', 'harga', 'tgl_terbit'];
+    // jenis_buku (Latihan 1) dan cover (upload sampul) ditambahkan di sini
+    protected $fillable = [
+        'judul',
+        'penulis',
+        'harga',
+        'tgl_terbit',
+        'jenis_buku',
+        'cover',
+    ];
 
     // Aku ubah tipe data tgl_terbit jadi date/datetime biar format date di Blade ($buku->tgl_terbit->format('d/m/Y')) ga error
     protected $casts = [
