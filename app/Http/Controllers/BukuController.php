@@ -11,12 +11,12 @@ class BukuController extends Controller
     /**
      * Pasang middleware lewat constructor.
      * auth   : semua method hanya bisa dibuka setelah login.
-     * admin  : semua method kecuali index hanya bisa dibuka oleh admin.
+     * admin  : semua method kecuali index, listBuku, dan galbuku hanya bisa dibuka oleh admin.
      */
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin')->except('index');
+        $this->middleware('admin')->except(['index', 'listBuku', 'galbuku']);
     }
 
     /**
@@ -126,5 +126,25 @@ class BukuController extends Controller
         $buku->delete();
 
         return redirect()->route('buku.index')->with('pesan', 'Data buku berhasil dihapus');
+    }
+
+    /**
+     * Menampilkan halaman daftar buku (Modul SEO).
+     */
+    public function listBuku()
+    {
+        $bukus = Buku::whereNotNull('foto')->orderBy('judul')->get();
+        return view('buku.list_buku', compact('bukus'));
+    }
+
+    /**
+     * Menampilkan halaman detail galeri buku berdasarkan slug buku_seo (Modul SEO).
+     */
+    public function galbuku($title)
+    {
+        $bukus = Buku::where('buku_seo', $title)->firstOrFail();
+        $galeris = $bukus->photos()->orderBy('id', 'desc')->paginate(6);
+
+        return view('buku.detail_buku', compact('bukus', 'galeris'));
     }
 }

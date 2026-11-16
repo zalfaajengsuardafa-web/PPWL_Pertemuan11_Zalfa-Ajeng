@@ -14,7 +14,7 @@
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 <body class="sb-nav-fixed">
-    {{-- Top Navbar: Menggunakan bg-primary agar bagian atas berwarna biru profesional --}}
+    {{-- Top Navbar: Menggunakan bg-primary agar bagian atas berwarna biru --}}
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-primary shadow-sm">
         {{-- Brand / Logo Aplikasi --}}
         <a class="navbar-brand ps-3 fw-bold fs-5" href="{{ route('buku.index') }}">
